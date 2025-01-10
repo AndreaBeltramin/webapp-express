@@ -12,12 +12,8 @@ app.use(express.static("public"));
 app.use(express.json());
 
 //! REGISTERING ROUTES
-const moviesRouter = require("");
+const moviesRouter = require("./routers/movies");
 app.use("/movies", moviesRouter);
-
-app.get("/", (req, res) => {
-	res.send("<h1>APP MOVIES</h1>");
-});
 
 //! MIDDLEWARE ERROR
 app.use(errorsHandler);
