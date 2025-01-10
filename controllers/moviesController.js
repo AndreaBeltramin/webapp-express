@@ -1,6 +1,7 @@
 //connetto Database e Express
 const { connected } = require("process");
 const connection = require("../db/connection");
+const { ok } = require("assert");
 
 //funzione index
 function index(req, res) {
@@ -13,23 +14,61 @@ function index(req, res) {
 		console.log(results);
 	});
 }
+
 //funzione show
 function show(req, res) {
-	//recupero id
-	const id = parseInt(req.params.id);
+	//recupero id del film
+	const movieId = req.params.id;
 	//imposto la query
-	const moviesSql =
-		"SELECT id, title, director, genre, release_year, abstract FROM `movies` WHERE id = ? ";
+	const moviesSql = `
+    SELECT id, title, director, genre, release_year, abstract 
+    FROM movies 
+    WHERE id = ?;
+    `;
 	//eseguo la query
-	connection.query(moviesSql, [id], (err, moviesResults) => {
+	connection.query(moviesSql, [movieId], (err, results) => {
 		//imposto messaggi di errore
-		if (err) return res.status(500).json({ error: "Database query failed" });
-		if (moviesResults.length === 0)
-			return res.status(404).json({ error: "Movie not found" });
+		if (err) {
+			console.log(err);
+			return res.status(500).json({
+				status: "Error",
+				message: "Database query failed",
+			});
+		}
 		//visualizzo il film cercato
-		const movie = moviesResults[0];
-		res.json(movie);
-		console.log(movie);
+		const [movie] = results;
+
+		if (!results) {
+			return res.status(404).json({
+				status: "Error",
+				message: "Movie not found",
+			});
+		}
+
+		//imposto la query per collegare le recensioni
+		const reviewsSql = `
+        SELECT reviews.*,
+        movies.id
+        FROM reviews
+        INNER JOIN movies
+        ON reviews.movie_id = movies.id
+        WHERE movie_id = ?
+        ;
+        `;
+		//eseguo la query
+		connection.query(reviewsSql, [movieId], (err, results) => {
+			//imposto messaggi di errore
+			if (err) return res.status(500).json({ error: "Database query failed" });
+			if (results.length === 0)
+				return res.status(404).json({ error: "Review not found" });
+
+			movie.reviews = results;
+
+			res.json({
+				status: "OK",
+				movie,
+			});
+		});
 	});
 }
 
