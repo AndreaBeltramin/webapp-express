@@ -47,8 +47,7 @@ function show(req, res) {
 
 		//imposto la query per collegare le recensioni
 		const reviewsSql = `
-        SELECT reviews.*,
-        movies.id
+        SELECT reviews.id AS id_recensione, reviews.name, reviews.vote, reviews.text
         FROM reviews
         INNER JOIN movies
         ON reviews.movie_id = movies.id
