@@ -2,3 +2,28 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+
+//! REGISTERING MIDDLEWARES
+const errorsHandler = require("./middlewares/errorHandler");
+const notFound = require("./middlewares/notFound");
+
+//! configurazione per visualizzare i dati
+app.use(express.static("public"));
+app.use(express.json());
+
+//! REGISTERING ROUTES
+const moviesRouter = require("");
+app.use("/movies", moviesRouter);
+
+app.get("/", (req, res) => {
+	res.send("<h1>APP MOVIES</h1>");
+});
+
+//! MIDDLEWARE ERROR
+app.use(errorsHandler);
+app.use(notFound);
+
+//! START LISTENIG
+app.listen(port, () => {
+	console.log("App listening on port 3000");
+});
