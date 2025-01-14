@@ -1,7 +1,11 @@
 //connetto Database e Express
 const { connected } = require("process");
 const connection = require("../db/connection");
-const { ok } = require("assert");
+
+//funzione per completare path immagini
+const generatePathImg = (imageName) => {
+	return "http://localhost:3000/movies_cover/" + imageName;
+};
 
 //funzione index
 function index(req, res) {
@@ -10,8 +14,11 @@ function index(req, res) {
 	//eseguo la query
 	connection.query(sql, (err, results) => {
 		if (err) return res.status(500).json({ error: "Database query failed" });
-		res.json(results);
-		console.log(results);
+		const movies = results.map((movie) => ({
+			...movie,
+			image: generatePathImg(movie.image),
+		}));
+		console.log(movies);
 	});
 }
 
@@ -21,7 +28,7 @@ function show(req, res) {
 	const movieId = req.params.id;
 	//imposto la query
 	const moviesSql = `
-    SELECT id, title, director, genre, release_year, abstract 
+    SELECT id, title, director, genre, release_year, abstract, image
     FROM movies 
     WHERE id = ?;
     `;
@@ -37,6 +44,8 @@ function show(req, res) {
 		}
 		//visualizzo il film cercato
 		const [movie] = results;
+		movie.image = generatePathImg(movie.image);
+		console.log(movie.image);
 
 		if (!results) {
 			return res.status(404).json({

@@ -11,6 +11,14 @@ const notFound = require("./middlewares/notFound");
 app.use(express.static("public"));
 app.use(express.json());
 
+//! configurazione CORS
+const cors = require("cors");
+const corsOptions = {
+	origin: "http://localhost:5173",
+	optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 //! REGISTERING ROUTES
 const moviesRouter = require("./routers/movies");
 app.use("/movies", moviesRouter);
