@@ -100,13 +100,13 @@ function show(req, res) {
 function createNewReview(req, res) {
 	//recupero id del film
 	const movieId = req.params.id;
-	const [name, text, vote] = req.body;
+	const { name, text, vote } = req.body;
 	//imposto la query
 	const reviewSql = `
-    INSERT INTO reviews (name, text, vote, bookId) VALUES (?, ?, ?, ?);
+    INSERT INTO reviews (name, text, vote, movie_id) VALUES (?, ?, ?, ?);
     `;
 	//eseguo la query
-	connection.query(reviewSql, [name, text, vote, bookId], (err) => {
+	connection.query(reviewSql, [name, text, vote, movieId], (err) => {
 		//imposto messaggi di errore
 		if (err) {
 			console.log(err);
